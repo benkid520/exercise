@@ -1,8 +1,7 @@
 #pragma once
 //#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
+#define INIT_SIZE 5
 #include <iostream>
-#include <string>
 using namespace std;
 template <typename T>
 class Container
@@ -99,7 +98,7 @@ public:
 		cout << endl;
 	};
 private:
-	T* vessel = new T[5];
+	T* vessel = new T[INIT_SIZE];
 	void extendCapac() {
 		int newCapacity = capacity + (int)(capacity * 0.5);
 		T* temp = new T[newCapacity];
