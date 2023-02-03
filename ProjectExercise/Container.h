@@ -9,22 +9,30 @@ class Container
 {
 public:
 	size_t size = sizeof(T);
-	int count = 0;
-	int capacity = 5;
+	unsigned int iter_index = 0;
+	unsigned int count = 0;
+	unsigned int capacity = INIT_SIZE;
 	Container();
 	~Container();
-	void pushBack(T element);
-	void pushFront(T element);
-	void pushByIndex(int index, T element);
-	void popBack();
-	void popFront();
-	void popByIndex(int index);
-	void printElement();
+
+	void push_back(T element);
+	void push_front(T element);
+	void push_by_index(unsigned int index, T element);
+
+	void pop_back();
+	void pop_front();
+	void pop_by_index(unsigned int index);
+
+	T iter_element();
+
+	void print_element();
 private:
 	T* vessel = new T[INIT_SIZE];
-	void extendCapac();
-	void decreCapac();
+	void extend_capac();
+	void decre_capac();
 };
+
+
 
 template <typename T>
 Container<T>::Container() {
@@ -37,17 +45,17 @@ Container<T>::~Container() {
 };
 
 template <typename T>
-void  Container<T>::pushBack(T element) {
+void  Container<T>::push_back(T element) {
 	if (count == capacity) {
-		extendCapac();
+		extend_capac();
 	}
 	vessel[count] = T(element);
 	count++;
 };
 template <typename T>
-void Container<T>::pushFront(T element) {
+void Container<T>::push_front(T element) {
 	if (count == capacity) {
-		extendCapac();
+		extend_capac();
 	}
 	memmove_s(vessel + 1, capacity * size - size, vessel, count * size);
 	memset(vessel, 0, size);
@@ -55,9 +63,9 @@ void Container<T>::pushFront(T element) {
 	count++;
 };
 template <typename T>
-void Container<T>::pushByIndex(int index, T element) {
+void Container<T>::push_by_index(unsigned int index, T element) {
 	if (count == capacity) {
-		extendCapac();
+		extend_capac();
 	}
 	if (index <= count) {
 
@@ -74,19 +82,19 @@ void Container<T>::pushByIndex(int index, T element) {
 };
 
 template <typename T>
-void Container<T>::popBack() {
+void Container<T>::pop_back() {
 	if (count) {
 		memset(vessel + (count - 1), 0, size);
 		vessel[count - 1] = T();
 		count--;
 	};
 	if (capacity - count > count) {
-		decreCapac();
+		decre_capac();
 	};
 };
 
 template <typename T>
-void Container<T>::popFront() {
+void Container<T>::pop_front() {
 	if (count) {
 		memmove_s(vessel, count * size, vessel + 1, count * size - size);
 		memset(vessel + (count - 1), 0, size);
@@ -94,12 +102,12 @@ void Container<T>::popFront() {
 		count--;
 	};
 	if (capacity - count > count) {
-		decreCapac();
+		decre_capac();
 	};
 };
 
 template <typename T>
-void Container<T>::popByIndex(int index) {
+void Container<T>::pop_by_index(unsigned int index) {
 	if (count && index < count) {
 		memmove_s(
 			vessel + index,
@@ -112,26 +120,38 @@ void Container<T>::popByIndex(int index) {
 		count--;
 	};
 	if (capacity - count > count) {
-		decreCapac();
+		decre_capac();
 	};
 };
 
 template <typename T>
-void Container<T>::printElement() {
-	for (int i = 0; i < count; i++)
+T Container<T>::iter_element() {
+	if (!(iter_index<count))
+	{
+		iter_index = 0;
+	}
+	return vessel[iter_index++];
+};
+
+template <typename T>
+void Container<T>::print_element() {
+	for (unsigned int i = 0; i < count; i++)
 	{
 		cout << vessel[i] << " ";
 	}
-	for (int i = 0; i < capacity - count; i++)
+	for (unsigned int i = 0; i < capacity - count; i++)
 	{
 		cout << "_ ";
 	}
 	cout << endl;
+	cout << "count:\t\t" << count << endl;
+	cout << "capacity:\t" << capacity << endl;
+	cout << endl;
 };
 
 template <typename T>
-void Container<T>::extendCapac() {
-	int newCapacity = capacity + (int)(capacity * 0.5);
+void Container<T>::extend_capac() {
+	unsigned int newCapacity = capacity + (unsigned int)(capacity * 0.5);
 	T* temp = new T[newCapacity];
 	memmove_s(temp, newCapacity * size, vessel, count * size);
 	memset(vessel, 0, size * capacity); //Essential part , if without it user-define type may occur destructor execute ahead of time
@@ -141,8 +161,8 @@ void Container<T>::extendCapac() {
 };
 
 template <typename T>
-void Container<T>::decreCapac() {
-	int newCapacity = count;
+void Container<T>::decre_capac() {
+	unsigned int newCapacity = count;
 	T* temp = new T[newCapacity];
 	memmove_s(temp, newCapacity * size, vessel, count * size);
 	memset(vessel, 0, size * capacity);

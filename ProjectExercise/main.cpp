@@ -5,17 +5,22 @@ using namespace std;
 int main() {
 	
 	Container<string> c;
-	c.pushBack("hello");
-	c.pushBack("world");
-	c.pushBack("!");
-	c.printElement();
-	c.pushFront("first");
-	c.pushBack("back");
-	c.pushByIndex(1, "sec");
-	c.printElement();
-	c.popFront();
-	c.popBack();
-	c.popByIndex(1);
-	c.printElement();
+	c.push_back("hello");
+	c.push_back("world");
+	c.push_back("!");
+	c.print_element();
+	c.push_front("first");
+	c.push_back("back");
+	c.push_by_index(1, "sec");
+	c.print_element();
+	c.pop_front();
+	c.pop_back();
+	c.pop_by_index(1);
+	c.print_element();
+
+	for (size_t i = 0; i < 10; i++)
+	{
+		cout << c.iter_element() << endl;
+	}
 	return 0;
 };
