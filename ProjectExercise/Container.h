@@ -4,16 +4,29 @@
 #include <iostream>
 using namespace std;
 
+
+
 template <typename T>
 class Container
 {
+	typedef int(*CmpPtr)(T,T);
 public:
 	size_t size = sizeof(T);
-	unsigned int iter_index = 0;
-	unsigned int count = 0;
-	unsigned int capacity = INIT_SIZE;
 	Container();
 	~Container();
+
+	/*
+		set_cmpfunc:
+		Set a compare function to a pointer for sort component
+		the function format should be   :    int(*)(T mainVar,T subVar)
+		if mainVar greater than subVar return 1
+		if mainVar equal subVar return 0
+		if mainVar less than subVar return -1
+	*/
+	//inline void set_cmpfunc(void* p);
+	inline void set_cmpfunc(CmpPtr p) { compare_fp = p; };
+	
+	//inline int(*get_fun())() { return compare_fp; };
 
 	void push_back(T element);
 	void push_front(T element);
@@ -23,11 +36,20 @@ public:
 	void pop_front();
 	void pop_by_index(unsigned int index);
 
+	void sort_asc();
+	void sort_desc();
+
 	T iter_element();
 
 	void print_element();
+
+	
 private:
+	unsigned int iter_index = 0;
+	unsigned int count = 0;
+	unsigned int capacity = INIT_SIZE;
 	T* vessel = new T[INIT_SIZE];
+	CmpPtr compare_fp = NULL;
 	void extend_capac();
 	void decre_capac();
 };
@@ -135,11 +157,11 @@ T Container<T>::iter_element() {
 
 template <typename T>
 void Container<T>::print_element() {
-	for (unsigned int i = 0; i < count; i++)
+	for (size_t i = 0; i < count; i++)
 	{
 		cout << vessel[i] << " ";
 	}
-	for (unsigned int i = 0; i < capacity - count; i++)
+	for (size_t i = 0; i < capacity - count; i++)
 	{
 		cout << "_ ";
 	}
@@ -147,6 +169,36 @@ void Container<T>::print_element() {
 	cout << "count:\t\t" << count << endl;
 	cout << "capacity:\t" << capacity << endl;
 	cout << endl;
+};
+
+template <typename T>
+void Container<T>::sort_asc() {
+	if (!compare_fp) return;
+	T temp = T();
+	for (size_t i = count - 1; i; i--) {
+		for (size_t j = 0; j < count - 1; j++) {
+			if (compare_fp(vessel[j], vessel[j+1])==1) {
+				temp = vessel[j];
+				vessel[j] = vessel[j + 1];
+				vessel[j + 1] = temp;
+			}
+		};
+	};
+};
+
+template <typename T>
+void Container<T>::sort_desc() {
+	if (!compare_fp) return;
+	T temp = T();
+	for (size_t i = count - 1; i; i--) {
+		for (size_t j = 0; j < count - 1; j++) {
+			if (compare_fp(vessel[j], vessel[j + 1]) == -1) {
+				temp = vessel[j];
+				vessel[j] = vessel[j + 1];
+				vessel[j + 1] = temp;
+			}
+		};
+	};
 };
 
 template <typename T>
