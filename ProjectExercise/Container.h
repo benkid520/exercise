@@ -1,7 +1,10 @@
 #pragma once
 //#define _CRT_SECURE_NO_WARNINGS
 #define INIT_SIZE 5
+#define EXTEND_SCALE_HALF capacity + (unsigned int)(capacity * 0.5)
+#define EXTEND_SCALE_QUARTER capacity + (unsigned int)(capacity * 0.25)
 #include <iostream>
+#include <initializer_list>
 using namespace std;
 
 
@@ -12,22 +15,19 @@ class Container
 	typedef int(*CmpPtr)(T,T);
 public:
 	size_t size = sizeof(T);
-	Container();
+	Container(initializer_list<T> lst);
 	~Container();
 
 	/*
 		set_cmpfunc:
 		Set a compare function to a pointer for sort component
-		the function format should be   :    int(*)(T mainVar,T subVar)
+		the function convention format should be   :    int(*)(T mainVar,T subVar)
 		if mainVar greater than subVar return 1
 		if mainVar equal subVar return 0
 		if mainVar less than subVar return -1
 	*/
-	//inline void set_cmpfunc(void* p);
 	inline void set_cmpfunc(CmpPtr p) { compare_fp = p; };
 	
-	//inline int(*get_fun())() { return compare_fp; };
-
 	void push_back(T element);
 	void push_front(T element);
 	void push_by_index(unsigned int index, T element);
@@ -50,15 +50,18 @@ private:
 	unsigned int capacity = INIT_SIZE;
 	T* vessel = new T[INIT_SIZE];
 	CmpPtr compare_fp = NULL;
-	void extend_capac();
+	void extend_capac(unsigned int extendScale);
 	void decre_capac();
 };
 
-
-
 template <typename T>
-Container<T>::Container() {
-
+Container<T>::Container(initializer_list<T> lst) {
+	if (lst.size() > capacity) extend_capac(capacity + lst.size());
+	for (size_t i = 0; i < lst.size(); i++)
+	{
+		vessel[i] = *(lst.begin() + i);
+	};
+	count = lst.size();
 };
 
 template <typename T>
@@ -66,29 +69,27 @@ Container<T>::~Container() {
 	delete[] vessel;
 };
 
+
+
 template <typename T>
 void  Container<T>::push_back(T element) {
-	if (count == capacity) {
-		extend_capac();
-	}
+	if (count == capacity) extend_capac(EXTEND_SCALE_HALF);
 	vessel[count] = T(element);
 	count++;
 };
+
 template <typename T>
 void Container<T>::push_front(T element) {
-	if (count == capacity) {
-		extend_capac();
-	}
+	if (count == capacity) extend_capac(EXTEND_SCALE_HALF);
 	memmove_s(vessel + 1, capacity * size - size, vessel, count * size);
 	memset(vessel, 0, size);
 	vessel[0] = T(element);
 	count++;
 };
+
 template <typename T>
 void Container<T>::push_by_index(unsigned int index, T element) {
-	if (count == capacity) {
-		extend_capac();
-	}
+	if (count == capacity) extend_capac(EXTEND_SCALE_HALF);
 	if (index <= count) {
 
 		memmove_s(
@@ -202,8 +203,8 @@ void Container<T>::sort_desc() {
 };
 
 template <typename T>
-void Container<T>::extend_capac() {
-	unsigned int newCapacity = capacity + (unsigned int)(capacity * 0.5);
+void Container<T>::extend_capac(unsigned int extendScale) {
+	unsigned int newCapacity = extendScale;								// capacity + (unsigned int)(capacity * 0.5);
 	T* temp = new T[newCapacity];
 	memmove_s(temp, newCapacity * size, vessel, count * size);
 	memset(vessel, 0, size * capacity); //Essential part , if without it user-define type may occur destructor execute ahead of time
