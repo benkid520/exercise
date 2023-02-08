@@ -3,6 +3,7 @@
 #define INIT_SIZE 5
 #define EXTEND_SCALE_HALF capacity + (unsigned int)(capacity * 0.5)
 #define EXTEND_SCALE_QUARTER capacity + (unsigned int)(capacity * 0.25)
+#define EXTEND_SCALE_INIT lst.size() + (lst.size() * 0.25)
 #include <iostream>
 #include <initializer_list>
 using namespace std;
@@ -56,7 +57,7 @@ private:
 
 template <typename T>
 Container<T>::Container(initializer_list<T> lst) {
-	if (lst.size() > capacity) extend_capac(capacity + lst.size());
+	if (lst.size() > capacity) extend_capac(EXTEND_SCALE_INIT);
 	for (size_t i = 0; i < lst.size(); i++)
 	{
 		vessel[i] = *(lst.begin() + i);
@@ -204,7 +205,7 @@ void Container<T>::sort_desc() {
 
 template <typename T>
 void Container<T>::extend_capac(unsigned int extendScale) {
-	unsigned int newCapacity = extendScale;								// capacity + (unsigned int)(capacity * 0.5);
+	unsigned int newCapacity = extendScale;								
 	T* temp = new T[newCapacity];
 	memmove_s(temp, newCapacity * size, vessel, count * size);
 	memset(vessel, 0, size * capacity); //Essential part , if without it user-define type may occur destructor execute ahead of time
