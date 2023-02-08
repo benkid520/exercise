@@ -19,6 +19,8 @@ public:
 	Container(initializer_list<T> lst);
 	~Container();
 
+	T& operator[](unsigned int i);
+
 	/*
 		set_cmpfunc:
 		Set a compare function to a pointer for sort component
@@ -70,7 +72,10 @@ Container<T>::~Container() {
 	delete[] vessel;
 };
 
-
+template <typename T>
+T& Container<T>::operator[](unsigned int i) {
+	return vessel[i];
+};
 
 template <typename T>
 void  Container<T>::push_back(T element) {
